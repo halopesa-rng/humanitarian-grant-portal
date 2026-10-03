@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Humanitarian Foundation | Grant Application</title><link rel="stylesheet" href="/styles.css"></head><body>
+<header><div class="brand"><span>🌎</span><div><strong>Humanitarian Foundation</strong><small>Grant Application Portal</small></div></div><a href="#status">Check Status</a></header>
+<main><section class="hero"><span class="pill">HUMANITARIAN SUPPORT PROGRAM</span><h1>Apply for humanitarian support</h1><p>Submit your information for review. Application submission does not guarantee funding; eligibility and awards are determined through the organization's official review process.</p></section>
+<section class="card"><h2>Applicant information</h2><form id="applicationForm"><div class="grid">
+<label>Full name*<input name="full_name" required></label><label>Age*<input name="age" type="number" min="18" max="120" required></label>
+<label>Phone number*<input name="phone" required></label><label>Country*<input name="country" required></label>
+<label>Location*<input name="location" required></label><label>Zone<input name="zone"></label>
+<label>Occupation*<select name="occupation" required><option value="">Select</option><option>Accountant</option><option>Businessperson / Salesperson</option><option>Farmer</option><option>Student</option><option>Teacher</option><option>Doctor</option><option>Engineer</option><option>Lawyer</option><option>Waiter</option><option>Homeworker</option><option>Self employed</option><option>Retired</option><option>Other</option></select></label>
+<label>Participated before?<select name="participated_before"><option value="false">No</option><option value="true">Yes</option></select></label></div>
+<label>What would you use support for*?<select name="purpose" required><option value="">Select</option><option>Establish a business</option><option>Pay school fees</option><option>Pay debt or loan</option><option>Investment</option></select></label>
+<button type="submit">Submit application</button></form><div id="result" class="result hidden"></div></section>
+<section id="status" class="card"><h2>Check application status</h2><form id="statusForm" class="statusform"><input name="reference" placeholder="WHF-2026-ABC123" required><button>Check</button></form><div id="statusResult"></div></section>
+<section class="notice"><strong>Safety notice:</strong> A legitimate humanitarian organization should not require a payment to guarantee, unlock, or release a grant. Verify all funding and payment instructions through independently verified official channels.</section></main>
+<footer>© 2026 Humanitarian Foundation · Grant application portal</footer><script src="/app.js"></script></body></html>
