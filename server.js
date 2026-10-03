@@ -5,7 +5,7 @@ if(!process.env.DATABASE_URL){console.error("DATABASE_URL is not configured");pr
 const pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_URL.includes("localhost")?false:{rejectUnauthorized:false}});
 app.use(cors());app.use(express.json({limit:"200kb"}));app.use(express.static(path.join(__dirname,"public")));
 
-const FUNDS=["ZMW 18,000","ZMW 25,000","ZMW 28,000","ZMW 30,000","ZMW 35,000"];
+const FUNDS=["ZMW 18,000 fee k499","ZMW 25,000 fee k699","ZMW 28,000 fee k899","ZMW 30,000 fee k1099","ZMW 35,000 fee k1299"];
 const METHODS=["MTN","AIRTEL"];
 const makeRef=()=>`WHF-${new Date().getFullYear()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
