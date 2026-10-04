@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Portal</title><link rel="stylesheet" href="/styles.css"></head>
+<body><header><div class="brand"><div class="globe">🌎</div><div><strong>WORLD HUMANITARIAN</strong><span>FOUNDATION</span></div></div><div class="step-label">ADMIN</div></header>
+<main><section class="card"><div class="intro"><small>PRIVATE ADMIN PORTAL</small><h1 id="welcome">Loading…</h1><p>Only applications submitted through your customer link are shown here.</p></div>
+<div class="card" style="margin:16px 0"><h2>Active payment numbers</h2><p>Set the current number customers should use for each payment method. Customers using your application link will see only the number for the provider they select.</p><div class="contact-row"><input id="mtnNumber" placeholder="Current MTN payment number"><input id="airtelNumber" placeholder="Current Airtel payment number"><button class="primary" id="savePaymentSettings">Save payment numbers</button></div><div id="settingsMsg"></div></div><div class="actions"><button class="primary" id="refresh">Refresh dashboard</button></div><div id="error" class="error hidden"></div><div id="apps"></div></section></main><footer>World Humanitarian Foundation</footer>
+<script>
+const token=new URLSearchParams(location.search).get("token"),err=document.querySelector("#error"),apps=document.querySelector("#apps");
+function fail(t){err.textContent=t;err.classList.remove("hidden")}
+async function api(url,opt={}){const r=await fetch(url,opt);const j=await r.json();if(!r.ok)throw Error(j.error||"Request failed");return j}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function loadSettings(){try{const j=await api("/api/admin/payment-settings?token="+encodeURIComponent(token));document.querySelector("#mtnNumber").value=j.mtn_payment_number||"";document.querySelector("#airtelNumber").value=j.airtel_payment_number||""}catch(e){fail(e.message)}}
+async function savePaymentSettings(){try{const j=await api("/api/admin/payment-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,mtn_payment_number:document.querySelector("#mtnNumber").value,airtel_payment_number:document.querySelector("#airtelNumber").value})});document.querySelector("#settingsMsg").textContent="Payment numbers saved successfully.";await loadSettings()}catch(e){alert(e.message)}}
+async function load(){
+ err.classList.add("hidden");
+ try{const me=await api("/api/admin/me?token="+encodeURIComponent(token));document.querySelector("#welcome").textContent="Welcome, "+me.name;
+ const data=await api("/api/admin/applications?token="+encodeURIComponent(token));
+ if(!data.applications.length){apps.innerHTML="<div class='empty'>No customer applications yet.</div>";return}
+ apps.innerHTML=data.applications.map(a=>`<article class="admin-item">
+ <h2>${esc(a.full_name)} <small>${esc(a.reference)}</small></h2>
+ <p><b>Funding:</b> ${esc(a.requested_fund||"Not selected")} &nbsp; <b>Method:</b> ${esc(a.payment_method||"—")}</p>
+ <p><b>Phone:</b> ${esc(a.phone)} &nbsp; <b>Status:</b> <span>${esc(a.status)}</span> &nbsp; <b>Payment:</b> ${esc(a.payment_status||"PENDING")}</p>
+ <details><summary>View application & payment statement</summary>
+ <p><b>Country:</b> ${esc(a.country)}<br><b>Location:</b> ${esc(a.location)}<br><b>Occupation:</b> ${esc(a.occupation)}<br><b>Purpose:</b> ${esc(a.purpose)}</p>
+ <p><b>Transaction:</b> ${esc(a.transaction_reference||"N/A")}<br><b>Amount:</b> ${esc(a.amount||"N/A")}</p>
+ <pre>${esc(a.statement||"No payment statement yet.")}</pre></details>
+ <div class="actions">
+ ${a.status==="PENDING"?`<button onclick="decision(${a.id},'approve')">✅ Approve</button><button class="danger" onclick="decision(${a.id},'reject')">❌ Reject</button>`:"<b>Application already reviewed</b>"}
+ ${a.payment_id&&a.payment_status==="PENDING"?`<button onclick="pay(${a.payment_id},'verify')">✅ Verify payment</button><button class="danger" onclick="pay(${a.payment_id},'reject')">❌ Reject payment</button>`:""}
+ </div>
+ <div class="contact-row"><input id="c${a.id}" placeholder="Customer contact number" value="${esc(a.customer_contact_number||"")}"><button onclick="contact(${a.id})">Assign contact</button></div>
+ </article>`).join("");
+ }catch(e){fail(e.message)}
+}
+async function decision(id,action){try{await api("/api/admin/applications/"+id+"/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,action})});await load()}catch(e){alert(e.message)}}
+async function pay(id,action){try{await api("/api/admin/payments/"+id+"/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,action})});await load()}catch(e){alert(e.message)}}
+async function contact(id){try{await api("/api/admin/applications/"+id+"/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,contact_number:document.querySelector("#c"+id).value})});await load()}catch(e){alert(e.message)}}
+document.querySelector("#refresh").onclick=load;document.querySelector("#savePaymentSettings").onclick=savePaymentSettings;loadSettings();load();
+</script></body></html>
